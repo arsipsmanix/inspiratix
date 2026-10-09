@@ -3,39 +3,82 @@ const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwDXXXAPlqzfXufgN8OL
 
 let base64Foto = "";
 
-// Set Default Tanggal Hari Ini dalam String YYYY-MM-DD (Mencegah Isu UTC Offset)
+// Inisialisasi saat halaman dibuka / direload
 window.onload = function() {
+  // Set default tanggal hari ini (Format YYYY-MM-DD murni)
   const today = new Date();
   const yyyy = today.getFullYear();
   const mm = String(today.getMonth() + 1).padStart(2, '0');
   const dd = String(today.getDate()).padStart(2, '0');
-  document.getElementById("inputTanggal").value = `${yyyy}-${mm}-${dd}`;
+  const strToday = `${yyyy}-${mm}-${dd}`;
+
+  const inputTanggal = document.getElementById("inputTanggal");
+  if (inputTanggal && !inputTanggal.value) {
+    inputTanggal.value = strToday;
+  }
+
+  // Cek Sesi Tersimpan (Mencegah terlempar ke Homescreen saat ke-reload)
+  const savedMgmp = localStorage.getItem("kombel_mgmp");
+  const savedTanggal = localStorage.getItem("kombel_tanggal");
+
+  if (savedMgmp && savedTanggal) {
+    document.getElementById("selectMgmp").value = savedMgmp;
+    document.getElementById("inputTanggal").value = savedTanggal;
+    masukKeJurnal(false); // Langsung tampilkan jurnal tanpa reset sesi
+  }
 };
 
-// Trigger saat MGMP dipilih
-async function loadGuruAndData() {
+// Fungsi saat tombol LogIn diklik
+async function loginJurnal() {
   const mgmp = document.getElementById("selectMgmp").value;
-  const mainGrid = document.getElementById("mainGrid");
-  const btnSimpan = document.getElementById("btnSimpan");
+  const tanggal = document.getElementById("inputTanggal").value;
 
   if (!mgmp) {
-    mainGrid.classList.add("opacity-50", "pointer-events-none");
-    btnSimpan.disabled = true;
-    btnSimpan.className = "bg-slate-400 text-white font-bold px-8 py-3.5 rounded-xl shadow-lg text-base cursor-not-allowed";
+    alert("Silakan pilih MGMP / Mapel terlebih dahulu!");
+    return;
+  }
+  if (!tanggal) {
+    alert("Silakan pilih Tanggal Pertemuan terlebih dahulu!");
     return;
   }
 
-  mainGrid.classList.remove("opacity-50", "pointer-events-none");
-  btnSimpan.disabled = false;
-  btnSimpan.className = "bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-8 py-3.5 rounded-xl shadow-lg text-base transition cursor-pointer";
+  // Simpan Sesi ke localStorage
+  localStorage.setItem("kombel_mgmp", mgmp);
+  localStorage.setItem("kombel_tanggal", tanggal);
 
-  // Reset Form & Load Data Guru
-  resetForm();
+  masukKeJurnal(true);
+}
+
+// Menampilkan Halaman Jurnal (4 Panel Grid)
+async function masukKeJurnal(isNewLogin = false) {
+  const mgmp = localStorage.getItem("kombel_mgmp");
+  const tanggal = localStorage.getItem("kombel_tanggal");
+
+  // Update Teks Info di Topbar Jurnal
+  document.getElementById("infoMgmpActive").innerText = mgmp;
+  document.getElementById("infoTanggalActive").innerText = tanggal;
+
+  // Pindah Tampilan (Hide Homescreen, Show Section Jurnal)
+  document.getElementById("sectionHomescreen").classList.add("hidden");
+  document.getElementById("sectionJurnal").classList.remove("hidden");
+
+  // Reset & Load Data Guru + Data Pertemuan
+  if (isNewLogin) resetForm();
   await fetchGuru(mgmp);
   await tarikDataPertemuan();
 }
 
-// Ambil Daftar Guru dari Backend
+// Logout / Keluar dari Jurnal (Kembali ke Homescreen)
+function keluarJurnal() {
+  localStorage.removeItem("kombel_mgmp");
+  localStorage.removeItem("kombel_tanggal");
+
+  document.getElementById("sectionJurnal").classList.add("hidden");
+  document.getElementById("sectionHomescreen").classList.remove("hidden");
+  resetForm();
+}
+
+// Ambil Daftar Guru dari Backend Apps Script
 async function fetchGuru(mgmp) {
   const container = document.getElementById("containerPresensi");
   container.innerHTML = '<span class="text-slate-400 italic">Memuat data guru...</span>';
@@ -46,23 +89,23 @@ async function fetchGuru(mgmp) {
 
     if (result.status === "success" && result.data.length > 0) {
       container.innerHTML = result.data.map(g => `
-        <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-100 p-1 rounded">
-          <input type="checkbox" name="guruHadir" value="${g.nama_guru}" class="w-4 h-4 text-blue-600 rounded">
-          <span>${g.nama_guru}</span>
+        <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-100 p-1.5 rounded transition">
+          <input type="checkbox" name="guruHadir" value="${g.nama_guru}" class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500">
+          <span class="text-slate-700">${g.nama_guru}</span>
         </label>
       `).join("");
     } else {
-      container.innerHTML = '<span class="text-slate-400 italic">Tidak ada guru terdaftar untuk MGMP ini.</span>';
+      container.innerHTML = '<span class="text-slate-400 italic">Tidak ada data guru terdaftar untuk MGMP ini.</span>';
     }
   } catch (err) {
-    container.innerHTML = '<span class="text-red-500 italic">Gagal memuat data guru.</span>';
+    container.innerHTML = '<span class="text-red-500 italic">Gagal memuat data guru. Cek koneksi internet.</span>';
   }
 }
 
 // Tarik Data Pertemuan berdasarkan MGMP + Tanggal
 async function tarikDataPertemuan() {
-  const mgmp = document.getElementById("selectMgmp").value;
-  const tanggal = document.getElementById("inputTanggal").value; // Format string: YYYY-MM-DD
+  const mgmp = localStorage.getItem("kombel_mgmp");
+  const tanggal = localStorage.getItem("kombel_tanggal");
 
   if (!mgmp || !tanggal) return;
 
@@ -87,7 +130,7 @@ async function tarikDataPertemuan() {
         });
       }
 
-      // Tampilkan indikator foto jika foto sudah ada
+      // Tampilkan foto jika sudah pernah tersimpan
       if (d.foto_url) {
         const imgPreview = document.getElementById("imgPreview");
         imgPreview.src = d.foto_url;
@@ -100,7 +143,7 @@ async function tarikDataPertemuan() {
   }
 }
 
-// Convert Foto dari Kamera Live ke Base64
+// Tangkap & Display Preview Foto Live dari Kamera HP
 function previewFoto(event) {
   const file = event.target.files[0];
   if (file) {
@@ -116,18 +159,18 @@ function previewFoto(event) {
   }
 }
 
-// Simpan Jurnal ke Apps Script
+// Simpan Jurnal ke Backend Apps Script
 async function simpanJurnal() {
   const btnSimpan = document.getElementById("btnSimpan");
-  const mgmp = document.getElementById("selectMgmp").value;
-  const tanggal = document.getElementById("inputTanggal").value; // String murni YYYY-MM-DD
+  const mgmp = localStorage.getItem("kombel_mgmp");
+  const tanggal = localStorage.getItem("kombel_tanggal");
 
   if (!mgmp || !tanggal) {
-    alert("Pilih MGMP dan Tanggal terlebih dahulu!");
+    alert("Sesi tidak valid. Silakan kembali ke Homescreen!");
     return;
   }
 
-  // Kumpulkan guru yang dicentang
+  // Ambil nama guru yang dicentang
   const presensiHadir = Array.from(document.querySelectorAll('input[name="guruHadir"]:checked'))
     .map(cb => cb.value)
     .join(", ");
@@ -144,7 +187,7 @@ async function simpanJurnal() {
   };
 
   btnSimpan.disabled = true;
-  btnSimpan.innerText = "⏳ Menyimpan Data...";
+  btnSimpan.innerHTML = "⏳ Menyimpan Data...";
 
   try {
     const response = await fetch(SCRIPT_URL, {
@@ -157,7 +200,7 @@ async function simpanJurnal() {
     if (result.status === "success") {
       alert("✅ " + result.message);
       base64Foto = "";
-      tarikDataPertemuan(); // Refresh data
+      tarikDataPertemuan();
     } else {
       alert("❌ Gagal menyimpan: " + result.message);
     }
@@ -165,8 +208,13 @@ async function simpanJurnal() {
     alert("❌ Terjadi kesalahan jaringan / server.");
   } finally {
     btnSimpan.disabled = false;
-    btnSimpan.innerText = "💾 Simpan Jurnal Pertemuan";
+    btnSimpan.innerHTML = "💾 Simpan Jurnal Pertemuan";
   }
+}
+
+// Modul Navigasi Panel Admin (Akan dikembangkan lebih lanjut)
+function bukaAdmin() {
+  alert("Fungsi Panel Admin akan segera kita rancang!");
 }
 
 function resetFormExceptPresensi() {
@@ -183,5 +231,5 @@ function resetFormExceptPresensi() {
 
 function resetForm() {
   resetFormExceptPresensi();
-  document.getElementById("containerPresensi").innerHTML = '<span class="text-slate-400 italic">Pilih MGMP terlebih dahulu...</span>';
+  document.getElementById("containerPresensi").innerHTML = '<span class="text-slate-400 italic">Memuat data guru...</span>';
 }
