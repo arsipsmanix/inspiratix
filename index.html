@@ -3,22 +3,25 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>InspiratIX</title>
-  <!-- Tailwind CSS CDN -->
+  <title>InspiratIX - Jurnal Kombel SMAN 9 Surabaya</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* CSS Khusus Cetak/Print */
+    @media print {
+      body * { visibility: hidden; }
+      #printArea, #printArea * { visibility: visible; }
+      #printArea { position: absolute; left: 0; top: 0; width: 100%; }
+    }
+  </style>
 </head>
 <body class="bg-slate-100 min-h-screen text-slate-800 flex flex-col justify-between">
 
-  <!-- Main Wrapper -->
   <main class="flex-grow">
     
     <!-- ================= HOMESCREEN SECTION ================= -->
     <section id="sectionHomescreen" class="max-w-md mx-auto px-4 py-12 flex flex-col items-center justify-center min-h-screen">
-      
-      <!-- Card Homescreen -->
       <div class="w-full bg-white rounded-2xl shadow-xl p-8 border border-slate-100 text-center">
         
-        <!-- Logo Header (Sejajar dalam folder yang sama) -->
         <div class="flex items-center justify-center gap-4 mb-6">
           <img src="logo-sma.png" alt="Logo SMA" class="h-16 w-auto object-contain">
           <img src="logo-kombel.png" alt="Logo Kombel" class="h-16 w-auto object-contain">
@@ -27,7 +30,6 @@
         <h1 class="text-xl font-bold text-slate-800">Jurnal Kombel InspiratIX</h1>
         <p class="text-xs text-slate-500 mb-6">SMA Negeri 9 Surabaya</p>
 
-        <!-- Form LogIn Guru -->
         <div class="space-y-4 text-left mb-6">
           <div>
             <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Pilih MGMP / Mapel</label>
@@ -48,18 +50,15 @@
           </div>
         </div>
 
-        <!-- Tombol LogIn -->
         <button onclick="loginJurnal()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg transition duration-200 flex items-center justify-center gap-2 text-sm">
           <span>🚀</span> LogIn Ke Jurnal
         </button>
 
-        <!-- Divider -->
         <div class="relative my-6">
           <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-slate-200"></div></div>
           <div class="relative flex justify-center text-xs uppercase"><span class="bg-white px-2 text-slate-400">Atau</span></div>
         </div>
 
-        <!-- Tombol Akses Admin -->
         <button onclick="bukaAdmin()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-2.5 px-4 rounded-xl transition duration-200 text-xs flex items-center justify-center gap-2">
           <span>⚙️</span> Akses Admin
         </button>
@@ -70,8 +69,6 @@
 
     <!-- ================= FORM JURNAL SECTION (4 PANEL) ================= -->
     <section id="sectionJurnal" class="hidden max-w-6xl mx-auto px-4 py-6">
-      
-      <!-- Topbar Info & Navigasi Logout -->
       <div class="bg-white rounded-xl shadow-md p-4 mb-6 flex flex-wrap items-center justify-between gap-4 border-l-4 border-blue-600">
         <div>
           <span class="text-xs text-slate-400 font-semibold uppercase">Pertemuan Terpilih</span>
@@ -86,15 +83,11 @@
         </button>
       </div>
 
-      <!-- 4 PANEL GRID -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        
         <!-- Panel 1: Administrasi & Presensi -->
         <div class="bg-white p-5 rounded-xl shadow-md border-t-4 border-blue-500 flex flex-col justify-between">
           <div>
-            <h2 class="text-base font-bold text-slate-800 mb-3 flex items-center gap-2">
-              <span>📋</span> 1. Administrasi & Presensi
-            </h2>
+            <h2 class="text-base font-bold text-slate-800 mb-3 flex items-center gap-2"><span>📋</span> 1. Administrasi & Presensi</h2>
             <div class="mb-4">
               <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Topik / Materi Pembahasan</label>
               <input type="text" id="inputTopik" placeholder="Contoh: Penyusunan Modul Ajar" class="w-full p-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm">
@@ -108,45 +101,33 @@
           </div>
         </div>
 
-        <!-- Panel 2: Notulensi Hasil Diskusi -->
+        <!-- Panel 2: Notulensi -->
         <div class="bg-white p-5 rounded-xl shadow-md border-t-4 border-emerald-500 flex flex-col justify-between">
           <div>
-            <h2 class="text-base font-bold text-slate-800 mb-3 flex items-center gap-2">
-              <span>📝</span> 2. Notulensi Hasil Diskusi
-            </h2>
-            <textarea id="inputNotulensi" rows="8" placeholder="Tuliskan poin-poin penting dan hasil diskusi pertemuan hari ini..." class="w-full p-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none text-sm resize-none"></textarea>
+            <h2 class="text-base font-bold text-slate-800 mb-3 flex items-center gap-2"><span>📝</span> 2. Notulensi Hasil Diskusi</h2>
+            <textarea id="inputNotulensi" rows="8" placeholder="Tuliskan poin-poin penting..." class="w-full p-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none text-sm resize-none"></textarea>
           </div>
         </div>
 
-        <!-- Panel 3: Rencana Tindak Lanjut (RTL) -->
+        <!-- Panel 3: RTL -->
         <div class="bg-white p-5 rounded-xl shadow-md border-t-4 border-amber-500 flex flex-col justify-between">
           <div>
-            <h2 class="text-base font-bold text-slate-800 mb-3 flex items-center gap-2">
-              <span>🚀</span> 3. Rencana Tindak Lanjut (RTL)
-            </h2>
-            <textarea id="inputRtl" rows="8" placeholder="Tuliskan rencana aksi nyata atau tindak lanjut setelah pertemuan..." class="w-full p-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none text-sm resize-none"></textarea>
+            <h2 class="text-base font-bold text-slate-800 mb-3 flex items-center gap-2"><span>🚀</span> 3. Rencana Tindak Lanjut (RTL)</h2>
+            <textarea id="inputRtl" rows="8" placeholder="Tuliskan rencana aksi..." class="w-full p-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none text-sm resize-none"></textarea>
           </div>
         </div>
 
         <!-- Panel 4: Unggah & Dokumentasi -->
         <div class="bg-white p-5 rounded-xl shadow-md border-t-4 border-purple-500 flex flex-col justify-between">
           <div>
-            <h2 class="text-base font-bold text-slate-800 mb-3 flex items-center gap-2">
-              <span>📸</span> 4. Unggah & Dokumentasi
-            </h2>
-            
-            <!-- Link Dokumen (Opsional) -->
+            <h2 class="text-base font-bold text-slate-800 mb-3 flex items-center gap-2"><span>📸</span> 4. Unggah & Dokumentasi</h2>
             <div class="mb-4">
               <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Link Dokumen (Opsional)</label>
               <input type="url" id="inputLink" placeholder="https://drive.google.com/..." class="w-full p-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none text-sm">
             </div>
-
-            <!-- Live Camera Photo -->
             <div>
               <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Foto Kegiatan (Kamera Live HP)</label>
               <input type="file" id="inputFoto" accept="image/*" capture="environment" onchange="previewFoto(event)" class="block w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100 cursor-pointer">
-              
-              <!-- Area Preview Foto -->
               <div class="mt-3 text-center">
                 <img id="imgPreview" class="hidden max-h-40 mx-auto rounded-lg shadow border border-slate-200">
                 <span id="txtFotoEksis" class="hidden text-xs text-emerald-600 font-semibold">✓ Foto kegiatan dari server sudah ada</span>
@@ -154,18 +135,78 @@
             </div>
           </div>
         </div>
-
       </div>
 
-      <!-- Tombol Simpan Jurnal -->
       <div class="mt-8 text-center">
         <button id="btnSimpan" onclick="simpanJurnal()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-10 py-3.5 rounded-xl shadow-lg text-base transition duration-200 cursor-pointer">
           💾 Simpan Jurnal Pertemuan
         </button>
       </div>
-
     </section>
+
+
+    <!-- ================= PANEL ADMIN SECTION ================= -->
+    <section id="sectionAdmin" class="hidden max-w-6xl mx-auto px-4 py-6">
+      <div class="bg-white rounded-xl shadow-md p-6 mb-6">
+        <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+          <div>
+            <h1 class="text-xl font-bold text-slate-800">Panel Admin & Rekapitulasi</h1>
+            <p class="text-xs text-slate-500">Kombel InspiratIX SMA Negeri 9 Surabaya</p>
+          </div>
+          <button onclick="keluarJurnal()" class="bg-slate-100 hover:bg-slate-200 text-slate-600 font-medium px-4 py-2 rounded-lg text-xs transition">
+            ⬅️ Kembali ke Utama
+          </button>
+        </div>
+
+        <!-- Filter Bulanan Admin -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 bg-slate-50 p-4 rounded-xl border border-slate-200">
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Filter Bulan</label>
+            <input type="month" id="filterBulanAdmin" onchange="renderTableAdmin()" class="w-full p-2.5 bg-white border border-slate-300 rounded-lg text-sm">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Filter MGMP</label>
+            <select id="filterMgmpAdmin" onchange="renderTableAdmin()" class="w-full p-2.5 bg-white border border-slate-300 rounded-lg text-sm">
+              <option value="">-- Semua MGMP --</option>
+              <option value="Fisika">Fisika</option>
+              <option value="Agama">Agama</option>
+              <option value="IPA">IPA</option>
+              <option value="Matematika">Matematika</option>
+              <option value="Bahasa Indonesia">Bahasa Indonesia</option>
+              <option value="Bahasa Inggris">Bahasa Inggris</option>
+            </select>
+          </div>
+          <div class="flex items-end">
+            <button onclick="cetakLaporanBulanan()" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold p-2.5 rounded-lg text-sm shadow transition flex items-center justify-center gap-2">
+              <span>🖨️</span> Cetak Laporan Bulanan (PDF)
+            </button>
+          </div>
+        </div>
+
+        <!-- Tabel Rekap -->
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="bg-slate-100 text-slate-600 uppercase text-xs">
+                <th class="p-3 text-center">No</th>
+                <th class="p-3">Tanggal</th>
+                <th class="p-3">MGMP</th>
+                <th class="p-3">Topik Pembahasan</th>
+                <th class="p-3 text-center">Foto</th>
+              </tr>
+            </thead>
+            <tbody id="tbodyAdmin">
+              <tr><td colspan="5" class="p-4 text-center text-slate-400">Memuat data rekap...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
   </main>
+
+  <!-- Area Rahasia Khusus Output Print -->
+  <div id="printArea" class="hidden"></div>
 
   <script src="script.js"></script>
 </body>
