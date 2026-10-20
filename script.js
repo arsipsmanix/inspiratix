@@ -3,7 +3,8 @@ const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwDXXXAPlqzfXufgN8OL
 let base64Foto = "";
 let allDataPertemuan = [];
 
-window.onload = function() {
+// Tambahkan/perbarui fungsi inisialisasi di script.js:
+window.onload = async function() {
   const today = new Date();
   const yyyy = today.getFullYear();
   const mm = String(today.getMonth() + 1).padStart(2, '0');
@@ -11,11 +12,17 @@ window.onload = function() {
   
   const inputTanggal = document.getElementById("inputTanggal");
   if (inputTanggal && !inputTanggal.value) {
-    inputTanggal.value = `${yyyy}-${mm}`;
-    // Set default bulan cetak admin ke bulan ini
-    document.getElementById("filterBulanAdmin").value = `${yyyy}-${mm}`;
+    inputTanggal.value = `${yyyy}-${mm}-${dd}`;
+  }
+  const filterBulanAdmin = document.getElementById("filterBulanAdmin");
+  if (filterBulanAdmin && !filterBulanAdmin.value) {
+    filterBulanAdmin.value = `${yyyy}-${mm}`;
   }
 
+  // Tarik daftar MGMP dari Google Sheet
+  await loadMgmpDropdown();
+
+  // Cek Sesi Tersimpan
   const savedMgmp = localStorage.getItem("kombel_mgmp");
   const savedTanggal = localStorage.getItem("kombel_tanggal");
 
@@ -25,6 +32,31 @@ window.onload = function() {
     masukKeJurnal(false);
   }
 };
+
+// Fungsi memuat daftar MGMP dinamis dari backend
+async function loadMgmpDropdown() {
+  const selectMgmp = document.getElementById("selectMgmp");
+  const filterMgmpAdmin = document.getElementById("filterMgmpAdmin");
+
+  try {
+    const response = await fetch(`${SCRIPT_URL}?action=getMgmpList`);
+    const result = await response.json();
+
+    if (result.status === "success" && result.data.length > 0) {
+      // Isilkan opsi di Homescreen
+      selectMgmp.innerHTML = '<option value="">-- Pilih MGMP --</option>' + 
+        result.data.map(m => `<option value="${m}">${m}</option>`).join("");
+
+      // Isikan opsi di Filter Admin
+      if (filterMgmpAdmin) {
+        filterMgmpAdmin.innerHTML = '<option value="">-- Semua MGMP --</option>' + 
+          result.data.map(m => `<option value="${m}">${m}</option>`).join("");
+      }
+    }
+  } catch (err) {
+    console.error("Gagal memuat daftar MGMP:", err);
+  }
+}
 
 async function loginJurnal() {
   const mgmp = document.getElementById("selectMgmp").value;
