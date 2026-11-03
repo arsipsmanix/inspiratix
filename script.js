@@ -253,41 +253,58 @@ async function loadAdminData() {
 
 // Perbaikan fungsi renderTableAdmin untuk merapikan format Tanggal ISO
 function renderTableAdmin() {
-  const bulan = document.getElementById("filterBulanAdmin").value; // Format: YYYY-MM
+  const bulan = document.getElementById("filterBulanAdmin").value;
   const mgmp = document.getElementById("filterMgmpAdmin").value;
   const tbody = document.getElementById("tbodyAdmin");
 
   let filtered = allDataPertemuan.filter(item => {
-    // Rapikan dulu format tanggal (jika dari Apps Script bentuknya ISO string seperti "2026-10-18T17:00:00.000Z")
-    let rawTanggal = item.tanggal ? String(item.tanggal) : "";
-    if (rawTanggal.includes("T")) {
-      rawTanggal = rawTanggal.split("T")[0];
+    // 1. Format Tanggal Kegiatan (Input Utama)
+    let cleanTanggalKegiatan = "";
+    if (item.tanggal) {
+      let d = new Date(item.tanggal);
+      if (!isNaN(d.getTime())) {
+        let yyyy = d.getFullYear();
+        let mm = String(d.getMonth() + 1).padStart(2, '0');
+        let dd = String(d.getDate()).padStart(2, '0');
+        cleanTanggalKegiatan = `${yyyy}-${mm}-${dd}`;
+      } else {
+        cleanTanggalKegiatan = String(item.tanggal).split("T")[0];
+      }
     }
-    
-    // Simpan tanggal yang sudah bersih kembali ke item
-    item.tanggalClean = rawTanggal;
+    item.tglKegiatanClean = cleanTanggalKegiatan;
 
-    let matchBulan = true;
-    let matchMgmp = true;
+    // 2. Format Tanggal & Jam Terakhir Update (WIB)
+    let cleanTglUpdate = "-";
+    if (item.timestamp) {
+      let du = new Date(item.timestamp);
+      if (!isNaN(du.getTime())) {
+        cleanTglUpdate = du.toLocaleString('id-ID', {
+          timeZone: 'Asia/Jakarta',
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        }).replace('.', ':');
+      }
+    }
+    item.tglUpdateClean = cleanTglUpdate;
 
-    if (bulan && rawTanggal) {
-      matchBulan = rawTanggal.startsWith(bulan);
-    }
-    if (mgmp) {
-      matchMgmp = item.mgmp === mgmp;
-    }
+    let matchBulan = bulan ? cleanTanggalKegiatan.startsWith(bulan) : true;
+    let matchMgmp = mgmp ? item.mgmp === mgmp : true;
     return matchBulan && matchMgmp;
   });
 
   if (filtered.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-slate-400">Tidak ada data kegiatan pada periode ini.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-400">Tidak ada data kegiatan pada periode ini.</td></tr>';
     return;
   }
 
   tbody.innerHTML = filtered.map((item, idx) => `
     <tr class="border-b border-slate-100 hover:bg-slate-50 text-sm">
       <td class="p-3 text-center">${idx + 1}</td>
-      <td class="p-3 font-semibold whitespace-nowrap">${item.tanggalClean || item.tanggal}</td>
+      <td class="p-3 font-semibold whitespace-nowrap">${item.tglKegiatanClean || item.tanggal}</td>
+      <td class="p-3 text-xs text-slate-500 whitespace-nowrap">${item.tglUpdateClean} WIB</td>
       <td class="p-3"><span class="bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-xs font-bold">${item.mgmp}</span></td>
       <td class="p-3">${item.topik || "-"}</td>
       <td class="p-3 text-center whitespace-nowrap">
