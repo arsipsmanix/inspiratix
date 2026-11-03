@@ -251,18 +251,27 @@ async function loadAdminData() {
   }
 }
 
-// PERBAIKAN RENDER TABEL ADMIN (Menambahkan Tombol Intip & Cetak Satuan)
+// Perbaikan fungsi renderTableAdmin untuk merapikan format Tanggal ISO
 function renderTableAdmin() {
-  const bulan = document.getElementById("filterBulanAdmin").value;
+  const bulan = document.getElementById("filterBulanAdmin").value; // Format: YYYY-MM
   const mgmp = document.getElementById("filterMgmpAdmin").value;
   const tbody = document.getElementById("tbodyAdmin");
 
   let filtered = allDataPertemuan.filter(item => {
+    // Rapikan dulu format tanggal (jika dari Apps Script bentuknya ISO string seperti "2026-10-18T17:00:00.000Z")
+    let rawTanggal = item.tanggal ? String(item.tanggal) : "";
+    if (rawTanggal.includes("T")) {
+      rawTanggal = rawTanggal.split("T")[0];
+    }
+    
+    // Simpan tanggal yang sudah bersih kembali ke item
+    item.tanggalClean = rawTanggal;
+
     let matchBulan = true;
     let matchMgmp = true;
 
-    if (bulan && item.tanggal) {
-      matchBulan = item.tanggal.startsWith(bulan);
+    if (bulan && rawTanggal) {
+      matchBulan = rawTanggal.startsWith(bulan);
     }
     if (mgmp) {
       matchMgmp = item.mgmp === mgmp;
@@ -278,7 +287,7 @@ function renderTableAdmin() {
   tbody.innerHTML = filtered.map((item, idx) => `
     <tr class="border-b border-slate-100 hover:bg-slate-50 text-sm">
       <td class="p-3 text-center">${idx + 1}</td>
-      <td class="p-3 font-semibold whitespace-nowrap">${item.tanggal}</td>
+      <td class="p-3 font-semibold whitespace-nowrap">${item.tanggalClean || item.tanggal}</td>
       <td class="p-3"><span class="bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-xs font-bold">${item.mgmp}</span></td>
       <td class="p-3">${item.topik || "-"}</td>
       <td class="p-3 text-center whitespace-nowrap">
