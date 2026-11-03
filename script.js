@@ -320,91 +320,103 @@ function renderTableAdmin() {
     </tr>
   `).join("");
 }
-// Fungsi Cetak Bulanan (Membuat Dokumen Resmi Siap Print/PDF)
+// ================= FUNGSI CETAK LAPORAN BULANAN =================
 function cetakLaporanBulanan() {
   const bulan = document.getElementById("filterBulanAdmin").value;
   const mgmp = document.getElementById("filterMgmpAdmin").value;
 
   let filtered = allDataPertemuan.filter(item => {
-    let matchBulan = bulan ? item.tanggal.startsWith(bulan) : true;
+    let rawDate = item.tglKegiatanClean || item.tanggal || "";
+    let matchBulan = bulan ? rawDate.startsWith(bulan) : true;
     let matchMgmp = mgmp ? item.mgmp === mgmp : true;
     return matchBulan && matchMgmp;
   });
 
   if (filtered.length === 0) {
-    alert("Tidak ada data yang tersedia untuk dicetak pada bulan/filter ini!");
+    alert("Tidak ada data kegiatan pada periode/filter ini!");
     return;
   }
 
   const printArea = document.getElementById("printArea");
   
-  // Format Nama Bulan
+  const today = new Date();
+  const optBln = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+  const tglTtd = `${today.getDate()} ${optBln[today.getMonth()]} ${today.getFullYear()}`;
+
   let namaBulanStr = bulan;
-  if(bulan) {
+  if (bulan) {
     const [dThn, dBln] = bulan.split("-");
-    const optBln = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
     namaBulanStr = `${optBln[parseInt(dBln)-1]} ${dThn}`;
   }
 
   let htmlCetak = `
-    <!-- KOP SURAT RESMI -->
-    <div style="text-align: center; border-bottom: 3px double #000; padding-bottom: 12px; margin-bottom: 20px;">
-      <h3 style="margin: 0; font-size: 14pt; text-transform: uppercase; font-weight: bold;">PEMERINTAH PROVINSI JAWA TIMUR</h3>
-      <h3 style="margin: 0; font-size: 14pt; text-transform: uppercase; font-weight: bold;">DINAS PENDIDIKAN</h3>
-      <h2 style="margin: 4px 0; font-size: 16pt; text-transform: uppercase; font-weight: bold;">SMA NEGERI 9 SURABAYA</h2>
-      <p style="margin: 0; font-size: 9pt;">Jl. Wijaya Kusuma No. 48, Surabaya, Jawa Timur | Telp: (031) 5342128</p>
+    <!-- KOP SURAT RESMI SMAN 9 SURABAYA -->
+    <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 3px double #000; padding-bottom: 8px; margin-bottom: 15px;">
+      <div style="width: 15%; text-align: left;">
+        <img src="logo-jatim.png" style="max-height: 85px; width: auto;">
+      </div>
+      <div style="width: 70%; text-align: center; font-family: Arial, sans-serif;">
+        <h4 style="margin: 0; font-size: 11pt; font-weight: bold; text-transform: uppercase;">PEMERINTAH PROVINSI JAWA TIMUR</h4>
+        <h4 style="margin: 0; font-size: 11pt; font-weight: bold; text-transform: uppercase;">DINAS PENDIDIKAN</h4>
+        <h3 style="margin: 2px 0; font-size: 13pt; font-weight: bold; text-transform: uppercase;">SEKOLAH MENENGAH ATAS NEGERI 9</h3>
+        <h3 style="margin: 0; font-size: 12pt; font-weight: bold; text-transform: uppercase;">KOMUNITAS BELAJAR INSPIRATIX</h3>
+        <p style="margin: 2px 0 0 0; font-size: 9pt; font-weight: bold;">SURABAYA (60272)</p>
+      </div>
+      <div style="width: 15%; text-align: right;">
+        <img src="logo-kombel.png" style="max-height: 85px; width: auto;">
+      </div>
     </div>
 
-    <div style="text-align: center; margin-bottom: 20px;">
-      <h3 style="margin: 0; font-size: 12pt; font-weight: bold; text-decoration: underline; text-transform: uppercase;">LAPORAN BULANAN PERTEMUAN KOMBEL INSPIRATIX</h3>
-      <p style="margin: 4px 0 0 0; font-size: 10pt;">Periode: ${namaBulanStr} ${mgmp ? '| MGMP: ' + mgmp : ''}</p>
+    <!-- JUDUL REKAP BULANAN -->
+    <div style="text-align: center; margin-bottom: 15px; font-family: Arial, sans-serif;">
+      <h3 style="margin: 0; font-size: 11pt; font-weight: bold; text-decoration: underline; text-transform: uppercase;">REKAPITULASI LAPORAN BULANAN KOMBEL</h3>
+      <p style="margin: 3px 0 0 0; font-size: 9.5pt; font-weight: bold;">Periode: ${namaBulanStr} ${mgmp ? '| MGMP: ' + mgmp : '| Semua MGMP'}</p>
     </div>
   `;
 
   filtered.forEach((item, index) => {
     htmlCetak += `
-      <div style="margin-bottom: 25px; page-break-inside: avoid; border: 1px solid #ccc; padding: 12px; border-radius: 6px;">
-        <h4 style="margin: 0 0 8px 0; font-size: 11pt; background: #f0f0f0; padding: 4px 8px; font-weight: bold;">
-          Kegiatan #${index + 1} - MGMP ${item.mgmp} (${item.tanggal})
+      <div style="margin-bottom: 20px; page-break-inside: avoid; border: 1px solid #cbd5e1; padding: 12px; border-radius: 6px; font-family: Arial, sans-serif; font-size: 9pt;">
+        <h4 style="margin: 0 0 6px 0; font-size: 10pt; background: #e2e8f0; padding: 4px 8px; font-weight: bold;">
+          Kegiatan #${index + 1} - MGMP ${item.mgmp} (${item.tglKegiatanClean || item.tanggal})
         </h4>
-        <table style="width: 100%; border-collapse: collapse; font-size: 9.5pt; margin-bottom: 8px;">
-          <tr><td style="width: 20%; font-weight: bold; padding: 3px 0;">Topik/Materi</td><td>: ${item.topik || '-'}</td></tr>
-          <tr><td style="font-weight: bold; padding: 3px 0;">Presensi Guru</td><td>: ${item.presensi_hadir || '-'}</td></tr>
-          <tr><td style="font-weight: bold; padding: 3px 0;">Link Dokumen</td><td>: ${item.link_dokumen ? `<a href="${item.link_dokumen}">${item.link_dokumen}</a>` : '-'}</td></tr>
+        <table style="width: 100%; border-collapse: collapse; margin-bottom: 6px;">
+          <tr><td style="width: 20%; font-weight: bold; padding: 2px 0;">Topik / Materi</td><td>: ${item.topik || '-'}</td></tr>
+          <tr><td style="font-weight: bold; padding: 2px 0;">Presensi Guru</td><td>: ${item.presensi_hadir || '-'}</td></tr>
+          ${item.link_dokumen ? `<tr><td style="font-weight: bold; padding: 2px 0;">Link Dokumen</td><td>: <a href="${item.link_dokumen}">${item.link_dokumen}</a></td></tr>` : ''}
         </table>
         
-        <div style="margin-bottom: 6px;">
+        <div style="margin-bottom: 4px;">
           <strong>Notulensi Hasil Diskusi:</strong>
-          <p style="margin: 2px 0 8px 0; font-size: 9.5pt; white-space: pre-line; background: #fafafa; padding: 6px; border: 1px solid #eee;">${item.notulensi || '-'}</p>
+          <p style="margin: 2px 0 4px 0; white-space: pre-line; background: #fafafa; padding: 4px 6px; border: 1px solid #f1f5f9; border-radius: 4px;">${item.notulensi || '-'}</p>
         </div>
 
-        <div style="margin-bottom: 6px;">
+        <div style="margin-bottom: 4px;">
           <strong>Rencana Tindak Lanjut (RTL):</strong>
-          <p style="margin: 2px 0 8px 0; font-size: 9.5pt; white-space: pre-line; background: #fafafa; padding: 6px; border: 1px solid #eee;">${item.rtl || '-'}</p>
+          <p style="margin: 2px 0 4px 0; white-space: pre-line; background: #fafafa; padding: 4px 6px; border: 1px solid #f1f5f9; border-radius: 4px;">${item.rtl || '-'}</p>
         </div>
 
         ${item.foto_url ? `
-          <div style="text-align: center; margin-top: 8px;">
-            <strong style="display: block; text-align: left; font-size: 9pt; mb-1">Dokumentasi Kegiatan:</strong>
-            <img src="${item.foto_url}" style="max-height: 180px; border: 1px solid #ddd; border-radius: 4px;">
+          <div style="text-align: center; margin-top: 6px;">
+            <img src="${item.foto_url}" style="max-height: 140px; width: auto; border: 1px solid #cbd5e1; border-radius: 4px;">
           </div>
         ` : ''}
       </div>
     `;
   });
 
-  // FORMAT TANDA TANGAN DEFAULT
+  // FORMAT TANDA TANGAN BULANAN
   htmlCetak += `
-    <div style="margin-top: 30px; display: flex; justify-content: space-between; font-size: 10pt; page-break-inside: avoid;">
-      <div style="text-align: center; width: 40%;">
-        <p style="margin-bottom: 60px;">Mengetahui,<br>Kepala SMAN 9 Surabaya</p>
-        <p style="font-weight: bold; text-decoration: underline; margin: 0;">( Nama Kepala Sekolah )</p>
-        <p style="margin: 0;">NIP. ....................................</p>
+    <div style="margin-top: 30px; display: flex; justify-content: space-between; font-family: Arial, sans-serif; font-size: 9.5pt; page-break-inside: avoid;">
+      <div style="text-align: center; width: 45%;">
+        <p style="margin: 0 0 55px 0;">Mengetahui<br><strong>Kepala SMAN 9 Surabaya</strong></p>
+        <p style="font-weight: bold; text-decoration: underline; margin: 0;">Tri Kurniawati, M.Pd</p>
+        <p style="margin: 2px 0 0 0;">NIP. 197203251997032003</p>
       </div>
-      <div style="text-align: center; width: 40%;">
-        <p style="margin-bottom: 60px;">Surabaya, ${new Date().getDate()} ${["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"][new Date().getMonth()]} ${new Date().getFullYear()}<br>Ketua Kombel InspiratIX</p>
-        <p style="font-weight: bold; text-decoration: underline; margin: 0;">( Nama Ketua Kombel )</p>
-        <p style="margin: 0;">NIP. ....................................</p>
+      <div style="text-align: center; width: 45%;">
+        <p style="margin: 0 0 55px 0;">Surabaya, ${tglTtd}<br><strong>Koordinator MGMP ${mgmp || ''}</strong></p>
+        <p style="font-weight: bold; text-decoration: underline; margin: 0;">____________________</p>
+        <p style="margin: 2px 0 0 0;">NIP. </p>
       </div>
     </div>
   `;
@@ -412,7 +424,6 @@ function cetakLaporanBulanan() {
   printArea.innerHTML = htmlCetak;
   window.print();
 }
-
 function resetFormExceptPresensi() {
   document.getElementById("inputTopik").value = "";
   document.getElementById("inputNotulensi").value = "";
@@ -473,62 +484,93 @@ function tutupModalDetail() {
 }
 
 // FUNGSI 2: Cetak Laporan 1 Pertemuan Khusus (Single Report Print)
+// ================= FUNGSI CETAK LAPORAN SATUAN =================
 function cetakLaporanSatuan(idPertemuan) {
   const item = allDataPertemuan.find(i => i.id_pertemuan === idPertemuan);
   if (!item) return alert("Data tidak ditemukan!");
 
   const printArea = document.getElementById("printArea");
 
+  const today = new Date();
+  const optBln = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+  const tglTtd = `${today.getDate()} ${optBln[today.getMonth()]} ${today.getFullYear()}`;
+
   let htmlCetak = `
-    <!-- KOP SURAT RESMI -->
-    <div style="text-align: center; border-bottom: 3px double #000; padding-bottom: 12px; margin-bottom: 20px;">
-      <h3 style="margin: 0; font-size: 14pt; text-transform: uppercase; font-weight: bold;">PEMERINTAH PROVINSI JAWA TIMUR</h3>
-      <h3 style="margin: 0; font-size: 14pt; text-transform: uppercase; font-weight: bold;">DINAS PENDIDIKAN</h3>
-      <h2 style="margin: 4px 0; font-size: 16pt; text-transform: uppercase; font-weight: bold;">SMA NEGERI 9 SURABAYA</h2>
-      <p style="margin: 0; font-size: 9pt;">Jl. Wijaya Kusuma No. 48, Surabaya, Jawa Timur | Telp: (031) 5342128</p>
+    <!-- KOP SURAT RESMI SMAN 9 SURABAYA -->
+    <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 3px double #000; padding-bottom: 8px; margin-bottom: 15px;">
+      <div style="width: 15%; text-align: left;">
+        <img src="logo-jatim.png" style="max-height: 85px; width: auto;">
+      </div>
+      <div style="width: 70%; text-align: center; font-family: Arial, sans-serif;">
+        <h4 style="margin: 0; font-size: 11pt; font-weight: bold; text-transform: uppercase;">PEMERINTAH PROVINSI JAWA TIMUR</h4>
+        <h4 style="margin: 0; font-size: 11pt; font-weight: bold; text-transform: uppercase;">DINAS PENDIDIKAN</h4>
+        <h3 style="margin: 2px 0; font-size: 13pt; font-weight: bold; text-transform: uppercase;">SEKOLAH MENENGAH ATAS NEGERI 9</h3>
+        <h3 style="margin: 0; font-size: 12pt; font-weight: bold; text-transform: uppercase;">KOMUNITAS BELAJAR INSPIRATIX</h3>
+        <p style="margin: 2px 0 0 0; font-size: 9pt; font-weight: bold;">SURABAYA (60272)</p>
+      </div>
+      <div style="width: 15%; text-align: right;">
+        <img src="logo-kombel.png" style="max-height: 85px; width: auto;">
+      </div>
     </div>
 
-    <div style="text-align: center; margin-bottom: 20px;">
-      <h3 style="margin: 0; font-size: 12pt; font-weight: bold; text-decoration: underline; text-transform: uppercase;">LAPORAN JURNAL PERTEMUAN KOMBEL INSPIRATIX</h3>
-      <p style="margin: 4px 0 0 0; font-size: 10pt;">MGMP ${item.mgmp} | Tanggal: ${item.tanggal}</p>
+    <!-- JUDUL LAPORAN -->
+    <div style="text-align: center; margin-bottom: 15px; font-family: Arial, sans-serif;">
+      <h3 style="margin: 0; font-size: 11pt; font-weight: bold; text-decoration: underline; text-transform: uppercase;">LAPORAN PERTEMUAN KOMBEL MGMP</h3>
+      <p style="margin: 3px 0 0 0; font-size: 9.5pt; font-weight: bold;">MGMP: ${item.mgmp} | Tanggal Kegiatan: ${item.tglKegiatanClean || item.tanggal}</p>
     </div>
 
-    <div style="margin-bottom: 25px; border: 1px solid #ccc; padding: 15px; border-radius: 6px;">
-      <table style="width: 100%; border-collapse: collapse; font-size: 10pt; margin-bottom: 12px;">
-        <tr><td style="width: 25%; font-weight: bold; padding: 4px 0;">Topik/Materi</td><td>: ${item.topik || '-'}</td></tr>
-        <tr><td style="font-weight: bold; padding: 4px 0;">Presensi Guru Hadir</td><td>: ${item.presensi_hadir || '-'}</td></tr>
-        <tr><td style="font-weight: bold; padding: 4px 0;">Link Dokumen</td><td>: ${item.link_dokumen ? `<a href="${item.link_dokumen}">${item.link_dokumen}</a>` : '-'}</td></tr>
-      </table>
+    <!-- ISI RINCIAN PERTEMUAN -->
+    <div style="font-family: Arial, sans-serif; font-size: 9.5pt; line-height: 1.4;">
       
+      <table style="width: 100%; border-collapse: collapse; margin-bottom: 10px;">
+        <tr>
+          <td style="width: 22%; font-weight: bold; padding: 4px 0; vertical-align: top;">Topik / Materi</td>
+          <td style="padding: 4px 0; vertical-align: top;">: <strong>${item.topik || '-'}</strong></td>
+        </tr>
+        <tr>
+          <td style="font-weight: bold; padding: 4px 0; vertical-align: top;">Presensi Guru Hadir</td>
+          <td style="padding: 4px 0; vertical-align: top;">: ${item.presensi_hadir || '-'}</td>
+        </tr>
+        ${item.link_dokumen ? `
+        <tr>
+          <td style="font-weight: bold; padding: 4px 0; vertical-align: top;">Link Dokumen</td>
+          <td style="padding: 4px 0; vertical-align: top;">: <a href="${item.link_dokumen}" target="_blank" style="color: #2563eb; text-decoration: underline;">${item.link_dokumen}</a></td>
+        </tr>
+        ` : ''}
+      </table>
+
       <div style="margin-bottom: 10px;">
-        <strong>Notulensi Hasil Diskusi:</strong>
-        <p style="margin: 4px 0 12px 0; font-size: 10pt; white-space: pre-line; background: #fafafa; padding: 8px; border: 1px solid #eee;">${item.notulensi || '-'}</p>
+        <strong style="display: block; margin-bottom: 3px; background: #f1f5f9; padding: 3px 6px; border-left: 3px solid #0284c7;">Notulensi Hasil Diskusi:</strong>
+        <div style="padding: 6px 8px; border: 1px solid #e2e8f0; border-radius: 4px; min-height: 50px; white-space: pre-line; background: #fafafa;">${item.notulensi || '-'}</div>
       </div>
 
       <div style="margin-bottom: 10px;">
-        <strong>Rencana Tindak Lanjut (RTL):</strong>
-        <p style="margin: 4px 0 12px 0; font-size: 10pt; white-space: pre-line; background: #fafafa; padding: 8px; border: 1px solid #eee;">${item.rtl || '-'}</p>
+        <strong style="display: block; margin-bottom: 3px; background: #f1f5f9; padding: 3px 6px; border-left: 3px solid #d97706;">Rencana Tindak Lanjut (RTL):</strong>
+        <div style="padding: 6px 8px; border: 1px solid #e2e8f0; border-radius: 4px; min-height: 50px; white-space: pre-line; background: #fafafa;">${item.rtl || '-'}</div>
       </div>
 
       ${item.foto_url ? `
-        <div style="text-align: center; margin-top: 12px;">
-          <strong style="display: block; text-align: left; font-size: 10pt; mb-2">Dokumentasi Kegiatan:</strong>
-          <img src="${item.foto_url}" style="max-height: 250px; border: 1px solid #ddd; border-radius: 4px;">
+      <div style="margin-bottom: 15px; page-break-inside: avoid;">
+        <strong style="display: block; margin-bottom: 4px; background: #f1f5f9; padding: 3px 6px; border-left: 3px solid #9333ea;">Dokumentasi Kegiatan:</strong>
+        <div style="text-align: center; padding: 6px; border: 1px solid #e2e8f0; border-radius: 4px;">
+          <img src="${item.foto_url}" style="max-height: 220px; width: auto; border-radius: 4px;">
         </div>
+      </div>
       ` : ''}
+
     </div>
 
-    <!-- FORMAT TANDA TANGAN -->
-    <div style="margin-top: 40px; display: flex; justify-content: space-between; font-size: 10pt; page-break-inside: avoid;">
-      <div style="text-align: center; width: 40%;">
-        <p style="margin-bottom: 60px;">Mengetahui,<br>Kepala SMAN 9 Surabaya</p>
-        <p style="font-weight: bold; text-decoration: underline; margin: 0;">( Nama Kepala Sekolah )</p>
-        <p style="margin: 0;">NIP. ....................................</p>
+    <!-- FORMAT TANDA TANGAN RESMI -->
+    <div style="margin-top: 30px; display: flex; justify-content: space-between; font-family: Arial, sans-serif; font-size: 9.5pt; page-break-inside: avoid;">
+      <div style="text-align: center; width: 45%;">
+        <p style="margin: 0 0 55px 0;">Mengetahui<br><strong>Kepala SMAN 9 Surabaya</strong></p>
+        <p style="font-weight: bold; text-decoration: underline; margin: 0;">Tri Kurniawati, M.Pd</p>
+        <p style="margin: 2px 0 0 0;">NIP. 197203251997032003</p>
       </div>
-      <div style="text-align: center; width: 40%;">
-        <p style="margin-bottom: 60px;">Surabaya, ${new Date().getDate()} ${["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"][new Date().getMonth()]} ${new Date().getFullYear()}<br>Ketua Kombel InspiratIX</p>
-        <p style="font-weight: bold; text-decoration: underline; margin: 0;">( Nama Ketua Kombel )</p>
-        <p style="margin: 0;">NIP. ....................................</p>
+      <div style="text-align: center; width: 45%;">
+        <p style="margin: 0 0 55px 0;">Surabaya, ${tglTtd}<br><strong>Koordinator MGMP ${item.mgmp}</strong></p>
+        <p style="font-weight: bold; text-decoration: underline; margin: 0;">____________________</p>
+        <p style="margin: 2px 0 0 0;">NIP. </p>
       </div>
     </div>
   `;
