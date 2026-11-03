@@ -213,5 +213,61 @@
   <div id="printArea" class="hidden"></div>
 
   <script src="script.js"></script>
+
+  <!-- ================= MODAL DETAIL PERTEMUAN (VIEW DETAIL) ================= -->
+  <div id="modalDetailAdmin" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] flex flex-col overflow-hidden border border-slate-100">
+      
+      <!-- Modal Header -->
+      <div class="p-5 bg-slate-800 text-white flex justify-between items-center">
+        <div>
+          <span id="modalDetailMgmp" class="bg-blue-500 text-white text-xs font-bold px-2.5 py-1 rounded-full uppercase">MGMP</span>
+          <h3 id="modalDetailTanggal" class="text-base font-bold mt-1">Detail Pertemuan</h3>
+        </div>
+        <button onclick="tutupModalDetail()" class="text-slate-400 hover:text-white text-2xl font-bold leading-none">&times;</button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="p-6 overflow-y-auto space-y-4 text-sm">
+        <div>
+          <label class="text-xs font-bold text-slate-400 uppercase">Topik Pembahasan</label>
+          <p id="modalDetailTopik" class="font-semibold text-slate-800 text-base border-b pb-2">-</p>
+        </div>
+        <div>
+          <label class="text-xs font-bold text-slate-400 uppercase">Daftar Presensi Guru Hadir</label>
+          <p id="modalDetailPresensi" class="bg-slate-50 p-3 rounded-lg border text-slate-700 font-medium text-xs">-</p>
+        </div>
+        <div>
+          <label class="text-xs font-bold text-slate-400 uppercase">Notulensi Hasil Diskusi</label>
+          <div id="modalDetailNotulensi" class="bg-slate-50 p-3 rounded-lg border text-slate-700 whitespace-pre-line text-xs min-h-[60px]">-</div>
+        </div>
+        <div>
+          <label class="text-xs font-bold text-slate-400 uppercase">Rencana Tindak Lanjut (RTL)</label>
+          <div id="modalDetailRtl" class="bg-slate-50 p-3 rounded-lg border text-slate-700 whitespace-pre-line text-xs min-h-[60px]">-</div>
+        </div>
+        <div id="modalContainerDokumen" class="hidden">
+          <label class="text-xs font-bold text-slate-400 uppercase">Link Dokumen</label>
+          <p><a id="modalDetailLink" href="#" target="_blank" class="text-blue-600 underline font-medium text-xs break-all">Buka Link Dokumen Lampiran</a></p>
+        </div>
+        <div>
+          <label class="text-xs font-bold text-slate-400 uppercase block mb-1">Foto Dokumentasi Kegiatan</label>
+          <div id="modalContainerFoto" class="text-center p-2 bg-slate-50 rounded-lg border">
+            <span class="text-slate-400 italic text-xs">Tidak ada foto dokumentasi</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="p-4 bg-slate-50 border-t flex justify-end gap-2">
+        <button id="btnModalCetakSatuan" onclick="" class="bg-purple-600 hover:bg-purple-700 text-white font-bold px-4 py-2 rounded-lg text-xs flex items-center gap-1.5 transition">
+          <span>🖨️</span> Cetak Pertemuan Ini
+        </button>
+        <button onclick="tutupModalDetail()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold px-4 py-2 rounded-lg text-xs transition">
+          Tutup
+        </button>
+      </div>
+
+    </div>
+  </div>
 </body>
 </html>
