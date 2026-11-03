@@ -359,8 +359,10 @@ function cetakLaporanBulanan() {
         <h4 style="margin: 0; font-size: 11pt; font-weight: bold; text-transform: uppercase;">PEMERINTAH PROVINSI JAWA TIMUR</h4>
         <h4 style="margin: 0; font-size: 11pt; font-weight: bold; text-transform: uppercase;">DINAS PENDIDIKAN</h4>
         <h3 style="margin: 2px 0; font-size: 13pt; font-weight: bold; text-transform: uppercase;">SEKOLAH MENENGAH ATAS NEGERI 9</h3>
-        <h3 style="margin: 0; font-size: 12pt; font-weight: bold; text-transform: uppercase;">KOMUNITAS BELAJAR INSPIRATIX</h3>
-        <p style="margin: 2px 0 0 0; font-size: 9pt; font-weight: bold;">SURABAYA (60272)</p>
+        <h3 style="margin: 0; font-size: 11pt; font-weight: bold; text-transform: uppercase;">KOMUNITAS BELAJAR INSPIRATIX</h3>
+        <p style="margin: 2px 0 0 0; font-size: 8.5pt;">Jalan Wijayakusuma Nomor 48, Ketabang, Genteng, Surabaya, Jawa Timur 60272</p>
+        <p style="margin: 1px 0 0 0; font-size: 8.5pt;">Telepon (031) 5342608 – Faksimili (031) 5477817</p>
+        <p style="margin: 1px 0 0 0; font-size: 8.5pt;">Laman sman9sby.sch.id Pos-el smanixsurabaya@gmail.com</p>
       </div>
       <div style="width: 15%; text-align: right;">
         <img src="logo-kombel.png" style="max-height: 85px; width: auto;">
@@ -408,15 +410,19 @@ function cetakLaporanBulanan() {
   // FORMAT TANDA TANGAN BULANAN
   htmlCetak += `
     <div style="margin-top: 30px; display: flex; justify-content: space-between; font-family: Arial, sans-serif; font-size: 9.5pt; page-break-inside: avoid;">
-      <div style="text-align: center; width: 45%;">
+      <div style="width: 45%; text-align: center;">
         <p style="margin: 0 0 55px 0;">Mengetahui<br><strong>Kepala SMAN 9 Surabaya</strong></p>
-        <p style="font-weight: bold; text-decoration: underline; margin: 0;">Tri Kurniawati, M.Pd</p>
-        <p style="margin: 2px 0 0 0;">NIP. 197203251997032003</p>
+        <div style="display: inline-block; text-align: left;">
+          <p style="font-weight: bold; text-decoration: underline; margin: 0;">Tri Kurniawati, M.Pd</p>
+          <p style="margin: 2px 0 0 0;">NIP. 197203251997032003</p>
+        </div>
       </div>
-      <div style="text-align: center; width: 45%;">
+      <div style="width: 45%; text-align: center;">
         <p style="margin: 0 0 55px 0;">Surabaya, ${tglTtd}<br><strong>Koordinator MGMP ${mgmp || ''}</strong></p>
-        <p style="font-weight: bold; text-decoration: underline; margin: 0;">____________________</p>
-        <p style="margin: 2px 0 0 0;">NIP. </p>
+        <div style="display: inline-block; text-align: left;">
+          <p style="font-weight: bold; text-decoration: underline; margin: 0;">____________________</p>
+          <p style="margin: 2px 0 0 0;">NIP.</p>
+        </div>
       </div>
     </div>
   `;
@@ -424,6 +430,7 @@ function cetakLaporanBulanan() {
   printArea.innerHTML = htmlCetak;
   window.print();
 }
+
 function resetFormExceptPresensi() {
   document.getElementById("inputTopik").value = "";
   document.getElementById("inputNotulensi").value = "";
@@ -505,8 +512,10 @@ function cetakLaporanSatuan(idPertemuan) {
         <h4 style="margin: 0; font-size: 11pt; font-weight: bold; text-transform: uppercase;">PEMERINTAH PROVINSI JAWA TIMUR</h4>
         <h4 style="margin: 0; font-size: 11pt; font-weight: bold; text-transform: uppercase;">DINAS PENDIDIKAN</h4>
         <h3 style="margin: 2px 0; font-size: 13pt; font-weight: bold; text-transform: uppercase;">SEKOLAH MENENGAH ATAS NEGERI 9</h3>
-        <h3 style="margin: 0; font-size: 12pt; font-weight: bold; text-transform: uppercase;">KOMUNITAS BELAJAR INSPIRATIX</h3>
-        <p style="margin: 2px 0 0 0; font-size: 9pt; font-weight: bold;">SURABAYA (60272)</p>
+        <h3 style="margin: 0; font-size: 11pt; font-weight: bold; text-transform: uppercase;">KOMUNITAS BELAJAR INSPIRATIX</h3>
+        <p style="margin: 2px 0 0 0; font-size: 8.5pt;">Jalan Wijayakusuma Nomor 48, Ketabang, Genteng, Surabaya, Jawa Timur 60272</p>
+        <p style="margin: 1px 0 0 0; font-size: 8.5pt;">Telepon (031) 5342608 – Faksimili (031) 5477817</p>
+        <p style="margin: 1px 0 0 0; font-size: 8.5pt;">Laman sman9sby.sch.id Pos-el smanixsurabaya@gmail.com</p>
       </div>
       <div style="width: 15%; text-align: right;">
         <img src="logo-kombel.png" style="max-height: 85px; width: auto;">
@@ -562,15 +571,19 @@ function cetakLaporanSatuan(idPertemuan) {
 
     <!-- FORMAT TANDA TANGAN RESMI -->
     <div style="margin-top: 30px; display: flex; justify-content: space-between; font-family: Arial, sans-serif; font-size: 9.5pt; page-break-inside: avoid;">
-      <div style="text-align: center; width: 45%;">
+      <div style="width: 45%; text-align: center;">
         <p style="margin: 0 0 55px 0;">Mengetahui<br><strong>Kepala SMAN 9 Surabaya</strong></p>
-        <p style="font-weight: bold; text-decoration: underline; margin: 0;">Tri Kurniawati, M.Pd</p>
-        <p style="margin: 2px 0 0 0;">NIP. 197203251997032003</p>
+        <div style="display: inline-block; text-align: left;">
+          <p style="font-weight: bold; text-decoration: underline; margin: 0;">Tri Kurniawati, M.Pd</p>
+          <p style="margin: 2px 0 0 0;">NIP. 197203251997032003</p>
+        </div>
       </div>
-      <div style="text-align: center; width: 45%;">
+      <div style="width: 45%; text-align: center;">
         <p style="margin: 0 0 55px 0;">Surabaya, ${tglTtd}<br><strong>Koordinator MGMP ${item.mgmp}</strong></p>
-        <p style="font-weight: bold; text-decoration: underline; margin: 0;">____________________</p>
-        <p style="margin: 2px 0 0 0;">NIP. </p>
+        <div style="display: inline-block; text-align: left;">
+          <p style="font-weight: bold; text-decoration: underline; margin: 0;">____________________</p>
+          <p style="margin: 2px 0 0 0;">NIP.</p>
+        </div>
       </div>
     </div>
   `;
