@@ -251,8 +251,9 @@ async function loadAdminData() {
   }
 }
 
+// PERBAIKAN RENDER TABEL ADMIN (Menambahkan Tombol Intip & Cetak Satuan)
 function renderTableAdmin() {
-  const bulan = document.getElementById("filterBulanAdmin").value; // Format: YYYY-MM
+  const bulan = document.getElementById("filterBulanAdmin").value;
   const mgmp = document.getElementById("filterMgmpAdmin").value;
   const tbody = document.getElementById("tbodyAdmin");
 
@@ -277,14 +278,22 @@ function renderTableAdmin() {
   tbody.innerHTML = filtered.map((item, idx) => `
     <tr class="border-b border-slate-100 hover:bg-slate-50 text-sm">
       <td class="p-3 text-center">${idx + 1}</td>
-      <td class="p-3 font-semibold">${item.tanggal}</td>
+      <td class="p-3 font-semibold whitespace-nowrap">${item.tanggal}</td>
       <td class="p-3"><span class="bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-xs font-bold">${item.mgmp}</span></td>
       <td class="p-3">${item.topik || "-"}</td>
-      <td class="p-3 text-center">${item.foto_url ? '📸 Ada' : '❌ -'}</td>
+      <td class="p-3 text-center whitespace-nowrap">
+        <div class="flex items-center justify-center gap-1.5">
+          <button onclick="lihatDetailPertemuan('${item.id_pertemuan}')" class="bg-blue-50 hover:bg-blue-100 text-blue-600 font-medium px-2.5 py-1 rounded text-xs border border-blue-200 transition">
+            👁️ Intip
+          </button>
+          <button onclick="cetakLaporanSatuan('${item.id_pertemuan}')" class="bg-purple-50 hover:bg-purple-100 text-purple-600 font-medium px-2.5 py-1 rounded text-xs border border-purple-200 transition">
+            🖨️ Cetak
+          </button>
+        </div>
+      </td>
     </tr>
   `).join("");
 }
-
 // Fungsi Cetak Bulanan (Membuat Dokumen Resmi Siap Print/PDF)
 function cetakLaporanBulanan() {
   const bulan = document.getElementById("filterBulanAdmin").value;
@@ -393,4 +402,111 @@ function resetFormExceptPresensi() {
 function resetForm() {
   resetFormExceptPresensi();
   document.getElementById("containerPresensi").innerHTML = '<span class="text-slate-400 italic">Memuat data guru...</span>';
+}
+
+// FUNGSI 1: Intip / View Detail Pertemuan dalam Modal
+function lihatDetailPertemuan(idPertemuan) {
+  const data = allDataPertemuan.find(item => item.id_pertemuan === idPertemuan);
+  if (!data) return alert("Data tidak ditemukan!");
+
+  document.getElementById("modalDetailMgmp").innerText = "MGMP " + data.mgmp;
+  document.getElementById("modalDetailTanggal").innerText = "Pertemuan Tanggal: " + data.tanggal;
+  document.getElementById("modalDetailTopik").innerText = data.topik || "-";
+  document.getElementById("modalDetailPresensi").innerText = data.presensi_hadir || "Tidak ada daftar hadir terisi.";
+  document.getElementById("modalDetailNotulensi").innerText = data.notulensi || "-";
+  document.getElementById("modalDetailRtl").innerText = data.rtl || "-";
+
+  // Link Dokumen
+  const containerDokumen = document.getElementById("modalContainerDokumen");
+  if (data.link_dokumen) {
+    document.getElementById("modalDetailLink").href = data.link_dokumen;
+    containerDokumen.classList.remove("hidden");
+  } else {
+    containerDokumen.classList.add("hidden");
+  }
+
+  // Foto Dokumentasi
+  const containerFoto = document.getElementById("modalContainerFoto");
+  if (data.foto_url) {
+    containerFoto.innerHTML = `<img src="${data.foto_url}" class="max-h-60 mx-auto rounded-lg shadow border">`;
+  } else {
+    containerFoto.innerHTML = `<span class="text-slate-400 italic text-xs">Tidak ada foto dokumentasi</span>`;
+  }
+
+  // Assign Tombol Cetak dari Modal
+  document.getElementById("btnModalCetakSatuan").onclick = function() {
+    tutupModalDetail();
+    cetakLaporanSatuan(idPertemuan);
+  };
+
+  document.getElementById("modalDetailAdmin").classList.remove("hidden");
+}
+
+function tutupModalDetail() {
+  document.getElementById("modalDetailAdmin").classList.add("hidden");
+}
+
+// FUNGSI 2: Cetak Laporan 1 Pertemuan Khusus (Single Report Print)
+function cetakLaporanSatuan(idPertemuan) {
+  const item = allDataPertemuan.find(i => i.id_pertemuan === idPertemuan);
+  if (!item) return alert("Data tidak ditemukan!");
+
+  const printArea = document.getElementById("printArea");
+
+  let htmlCetak = `
+    <!-- KOP SURAT RESMI -->
+    <div style="text-align: center; border-bottom: 3px double #000; padding-bottom: 12px; margin-bottom: 20px;">
+      <h3 style="margin: 0; font-size: 14pt; text-transform: uppercase; font-weight: bold;">PEMERINTAH PROVINSI JAWA TIMUR</h3>
+      <h3 style="margin: 0; font-size: 14pt; text-transform: uppercase; font-weight: bold;">DINAS PENDIDIKAN</h3>
+      <h2 style="margin: 4px 0; font-size: 16pt; text-transform: uppercase; font-weight: bold;">SMA NEGERI 9 SURABAYA</h2>
+      <p style="margin: 0; font-size: 9pt;">Jl. Wijaya Kusuma No. 48, Surabaya, Jawa Timur | Telp: (031) 5342128</p>
+    </div>
+
+    <div style="text-align: center; margin-bottom: 20px;">
+      <h3 style="margin: 0; font-size: 12pt; font-weight: bold; text-decoration: underline; text-transform: uppercase;">LAPORAN JURNAL PERTEMUAN KOMBEL INSPIRATIX</h3>
+      <p style="margin: 4px 0 0 0; font-size: 10pt;">MGMP ${item.mgmp} | Tanggal: ${item.tanggal}</p>
+    </div>
+
+    <div style="margin-bottom: 25px; border: 1px solid #ccc; padding: 15px; border-radius: 6px;">
+      <table style="width: 100%; border-collapse: collapse; font-size: 10pt; margin-bottom: 12px;">
+        <tr><td style="width: 25%; font-weight: bold; padding: 4px 0;">Topik/Materi</td><td>: ${item.topik || '-'}</td></tr>
+        <tr><td style="font-weight: bold; padding: 4px 0;">Presensi Guru Hadir</td><td>: ${item.presensi_hadir || '-'}</td></tr>
+        <tr><td style="font-weight: bold; padding: 4px 0;">Link Dokumen</td><td>: ${item.link_dokumen ? `<a href="${item.link_dokumen}">${item.link_dokumen}</a>` : '-'}</td></tr>
+      </table>
+      
+      <div style="margin-bottom: 10px;">
+        <strong>Notulensi Hasil Diskusi:</strong>
+        <p style="margin: 4px 0 12px 0; font-size: 10pt; white-space: pre-line; background: #fafafa; padding: 8px; border: 1px solid #eee;">${item.notulensi || '-'}</p>
+      </div>
+
+      <div style="margin-bottom: 10px;">
+        <strong>Rencana Tindak Lanjut (RTL):</strong>
+        <p style="margin: 4px 0 12px 0; font-size: 10pt; white-space: pre-line; background: #fafafa; padding: 8px; border: 1px solid #eee;">${item.rtl || '-'}</p>
+      </div>
+
+      ${item.foto_url ? `
+        <div style="text-align: center; margin-top: 12px;">
+          <strong style="display: block; text-align: left; font-size: 10pt; mb-2">Dokumentasi Kegiatan:</strong>
+          <img src="${item.foto_url}" style="max-height: 250px; border: 1px solid #ddd; border-radius: 4px;">
+        </div>
+      ` : ''}
+    </div>
+
+    <!-- FORMAT TANDA TANGAN -->
+    <div style="margin-top: 40px; display: flex; justify-content: space-between; font-size: 10pt; page-break-inside: avoid;">
+      <div style="text-align: center; width: 40%;">
+        <p style="margin-bottom: 60px;">Mengetahui,<br>Kepala SMAN 9 Surabaya</p>
+        <p style="font-weight: bold; text-decoration: underline; margin: 0;">( Nama Kepala Sekolah )</p>
+        <p style="margin: 0;">NIP. ....................................</p>
+      </div>
+      <div style="text-align: center; width: 40%;">
+        <p style="margin-bottom: 60px;">Surabaya, ${new Date().getDate()} ${["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"][new Date().getMonth()]} ${new Date().getFullYear()}<br>Ketua Kombel InspiratIX</p>
+        <p style="font-weight: bold; text-decoration: underline; margin: 0;">( Nama Ketua Kombel )</p>
+        <p style="margin: 0;">NIP. ....................................</p>
+      </div>
+    </div>
+  `;
+
+  printArea.innerHTML = htmlCetak;
+  window.print();
 }
