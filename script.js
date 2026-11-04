@@ -418,7 +418,7 @@ function cetakLaporanBulanan() {
         </div>
       </div>
       <div style="width: 45%; text-align: center;">
-        <p style="margin: 0 0 55px 0;">Surabaya, ${tglTtd}<br><strong>Koordinator MGMP ${mgmp || ''}</strong></p>
+        <p style="margin: 0 0 55px 0;">Surabaya, ${tglTtd}<br><strong>Koordinator Kombel ${mgmp || ''}</strong></p>
         <div style="display: inline-block; text-align: left;">
           <p style="font-weight: bold; text-decoration: underline; margin: 0;">____________________</p>
           <p style="margin: 2px 0 0 0;">NIP.</p>
