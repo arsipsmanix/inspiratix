@@ -506,7 +506,12 @@ function cetakLaporanSatuan(idPertemuan) {
     let d = new Date(rawDate);
     if (!isNaN(d.getTime())) {
       const optBln = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
-      tglTtd = `${d.getDate()}${optBln[d.getMonth()]} ${d.getFullYear()}`;  let yyyy = d.getFullYear(); let mm = String(d.getMonth() + 1).padStart(2, '0'); let dd = String(d.getDate()).padStart(2, '0'); tglKegiatanStr = `${yyyy}-${mm}-${dd}`;
+      tglTtd = `${d.getDate()} ${optBln[d.getMonth()]} ${d.getFullYear()}`;
+      
+      let yyyy = d.getFullYear();
+      let mm = String(d.getMonth() + 1).padStart(2, '0');
+      let dd = String(d.getDate()).padStart(2, '0');
+      tglKegiatanStr = `${yyyy}-${mm}-${dd}`;
     }
   }
 
@@ -533,7 +538,7 @@ function cetakLaporanSatuan(idPertemuan) {
     <!-- JUDUL LAPORAN -->
     <div style="text-align: center; margin-bottom: 15px; font-family: Arial, sans-serif;">
       <h3 style="margin: 0; font-size: 11pt; font-weight: bold; text-decoration: underline; text-transform: uppercase;">LAPORAN PERTEMUAN KOMBEL MGMP</h3>
-      <p style="margin: 3px 0 0 0; font-size: 9.5pt; font-weight: bold;">MGMP: ${item.mgmp} \vert{} Tanggal Kegiatan:${tglKegiatanStr}</p>
+      <p style="margin: 3px 0 0 0; font-size: 9.5pt; font-weight: bold;">MGMP: ${item.mgmp} | Tanggal Kegiatan: ${tglKegiatanStr}</p>
     </div>
 
     <!-- ISI RINCIAN PERTEMUAN -->
@@ -562,4 +567,40 @@ function cetakLaporanSatuan(idPertemuan) {
       </div>
 
       <div style="margin-bottom: 10px;">
-        <strong style="display: block; margin-bottom: 3px; background: #f1f5f9
+        <strong style="display: block; margin-bottom: 3px; background: #f1f5f9; padding: 3px 6px; border-left: 3px solid #d97706;">Rencana Tindak Lanjut (RTL):</strong>
+        <div style="padding: 6px 8px; border: 1px solid #e2e8f0; border-radius: 4px; min-height: 50px; white-space: pre-line; background: #fafafa;">${item.rtl || '-'}</div>
+      </div>
+
+      ${item.foto_url ? `
+      <div style="margin-bottom: 15px; page-break-inside: avoid;">
+        <strong style="display: block; margin-bottom: 4px; background: #f1f5f9; padding: 3px 6px; border-left: 3px solid #9333ea;">Dokumentasi Kegiatan:</strong>
+        <div style="text-align: center; padding: 6px; border: 1px solid #e2e8f0; border-radius: 4px;">
+          <img src="${item.foto_url}" style="max-height: 220px; width: auto; border-radius: 4px;">
+        </div>
+      </div>
+      ` : ''}
+
+    </div>
+
+    <!-- FORMAT TANDA TANGAN RESMI -->
+    <div style="margin-top: 30px; display: flex; justify-content: space-between; font-family: Arial, sans-serif; font-size: 9.5pt; page-break-inside: avoid;">
+      <div style="width: 45%; text-align: center;">
+        <p style="margin: 0 0 55px 0;">Mengetahui<br><strong>Kepala SMAN 9 Surabaya</strong></p>
+        <div style="display: inline-block; text-align: left;">
+          <p style="font-weight: bold; text-decoration: underline; margin: 0;">Tri Kurniawati, M.Pd</p>
+          <p style="margin: 2px 0 0 0;">NIP. 197203251997032003</p>
+        </div>
+      </div>
+      <div style="width: 45%; text-align: center;">
+        <p style="margin: 0 0 55px 0;">Surabaya, ${tglTtd}<br><strong>Koordinator MGMP ${item.mgmp}</strong></p>
+        <div style="display: inline-block; text-align: left;">
+          <p style="font-weight: bold; text-decoration: underline; margin: 0;">____________________</p>
+          <p style="margin: 2px 0 0 0;">NIP.</p>
+        </div>
+      </div>
+    </div>
+  `;
+
+  printArea.innerHTML = htmlCetak;
+  window.print();
+}
